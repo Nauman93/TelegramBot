@@ -8,25 +8,27 @@ const bot = new TelegramBot(token, {polling: true});
 
 //regular expression for 9gag website with id
 var expression = /https?:\/\/?9gag\.com\/gag\/([a-z]?[A-Z]?[0-9]?)*/gi;
-var id = 
 
 
 bot.onText(expression, function(msg, match) {
 
-//bot.sendMessage(msg.chat.id, "aa");
-gag.getItem(match[0], function (err, res) {
+var postId = match[0].split("/gag/")[1];
+
+gag.getItem(postId, function (err, res) {
   // res = {
   //   title: ,
   //   points: ,
   //   commentCount: ,
   //   image:
-  // }
-  //console.log(res);
-  //bot.sendPhoto(msg.chat.id, res.image);
-  bot.sendVideo(msg.chat.id, res.image);
+  // }  
+  console.log(res);
+  
+  if (res.type==='image'){
+  	bot.sendPhoto(msg.chat.id, res.image);
+  }
+  else if (res.type==='video'){
+  	bot.sendVideo(msg.chat.id, res.video);
+  }
+  
 });
-
-
-
-
 });
