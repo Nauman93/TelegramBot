@@ -1,0 +1,23 @@
+{
+  "name": "telegrambot",
+  "version": "1.0.0",
+  "description": "9gag Telegram Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nauman93/TelegramBot.git"
+  },
+  "author": "Nauman Mahmood",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nauman93/TelegramBot/issues"
+  },
+  "homepage": "https://github.com/Nauman93/TelegramBot#readme",
+  "dependencies": {
+    "node-9gag": "^0.2.4",
+    "node-telegram-bot-api": "^0.30.0"
+  }
+}
