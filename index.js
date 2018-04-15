@@ -1,8 +1,13 @@
+
 const TelegramBot = require('node-telegram-bot-api');
 
 const token = '555213521:AAHsCKoF_qmgbbRnvj2JAb8c7glBkv39XY4';
 
-var gag = require('node-9gag');
+var gag = {};
+
+gag.find = require('./lib/find');
+gag.getItem = require('./lib/getitem');
+gag.section = require('./lib/section');
 
 const bot = new TelegramBot(token, {polling: true});
 
