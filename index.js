@@ -1,15 +1,14 @@
 
 const TelegramBot = require('node-telegram-bot-api');
-    var fs = require('fs');
-	var request = require('request');
+var fs = require('fs');
+var request = require('request');
 
 const token = '555213521:AAHsCKoF_qmgbbRnvj2JAb8c7glBkv39XY4';
 
 var gag = {};
 
-gag.getTopComment = require('./lib/gettopcomments');
+gag.getTopComments = require('./lib/gettopcomments');
 gag.getPost = require('./lib/getpost');
-
 
 
 const bot = new TelegramBot(token, {polling: true});
@@ -18,21 +17,27 @@ const bot = new TelegramBot(token, {polling: true});
 var expression = /https?:\/\/?9gag\.com\/gag\/([a-z]?[A-Z]?[0-9]?)*/gi;
 
 
-    //download function that make a request for the image or video
-    var download = function(uri, filename, callback){
-          request.head(uri, function(err, res, body){
-            //console.log('content-type:', res.headers['content-type']);
-            //console.log('content-length:', res.headers['content-length']);
+//download function that make a request for the image or video
+var download = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
 
-            request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-          });
-        };
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
 
 bot.onText(expression, function(msg, match) {
 
 var postId = match[0].split("/gag/")[1];
 
-gag.getItem(postId, function (err, res) {
+//call gettopcomments function given the id of the post
+gag.getTopComments(postId, function (err, res){
+	
+});
+
+//call getpost function given the id of the post
+gag.getPost(postId, function (err, res) {
   // res = {
   //   title: ,
   //   points: ,
