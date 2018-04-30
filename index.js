@@ -31,25 +31,11 @@ bot.onText(expression, function(msg, match) {
 
 var postId = match[0].split("/gag/")[1];
 
-//call gettopcomments function given the id of the post
-gag.getTopComments(postId, function (err, res){
-	
-});
-
 //call getpost function given the id of the post
 gag.getPost(postId, function (err, res) {
-  // res = {
-  //   title: ,
-  //   points: ,
-  //   commentCount: ,
-  //   image:
-  // }  
-  //console.log(res);
-  
-	if (res.type==='image'){
-		bot.sendPhoto(msg.chat.id, res.image); 
 
-		
+	if (res.type==='image'){
+		bot.sendPhoto(msg.chat.id, res.image);
 
 		bot.sendMessage(msg.chat.id, "Do you want me to save this?",{
 			"reply_markup": {
@@ -86,5 +72,12 @@ gag.getPost(postId, function (err, res) {
   	}
   
 });
+
+//call gettopcomments function given the id of the post
+gag.getTopComments(postId, function (err, res){
+  //console.log(res);
+
+});
+
 });
 
