@@ -27,57 +27,163 @@ var download = function(uri, filename, callback){
     });
 };
 
+//function that handle sending comments in order
+var sendComments = function(bot, chatId, obj, index) {
+  //console.log(obj);
+  if (obj[index] != undefined){
+    if (obj[index].text != null){
+      //comment is only text
+      if (obj[index].image === null && obj[index].video === null){
+        bot.sendMessage(chatId, obj[index].text).then(() => {
+          index+=1;
+          sendComments(bot, chatId, obj, index);
+        });        
+      }
+      //comment is text and image/video
+      if(obj[index].image != null){
+        bot.sendPhoto(chatId, obj[index].image, {caption: obj[index].text}).then(() => {
+          index+=1;
+          sendComments(bot, chatId, obj, index);
+        });
+      }else if (obj[index].video != null){
+        bot.sendVideo(chatId, obj[index].video, {caption: obj[index].text}).then(() => {
+          index+=1;
+          sendComments(bot, chatId, obj, index);
+        });
+      }
+      
+    }else{
+      //comment is image or video
+      if (obj[index].image != null){
+        bot.sendPhoto(chatId, obj[index].image).then(() => {
+          index+=1;
+          sendComments(bot, chatId, obj, index);
+        });
+      }else{
+        bot.sendVideo(chatId, obj[index].video).then(() => {
+          index+=1;
+          sendComments(bot, chatId, obj, index);
+        });
+      }
+    }
+  }
+}
+
 bot.onText(expression, function(msg, match) {
 
-var postId = match[0].split("/gag/")[1];
+  var postId = match[0].split("/gag/")[1];
 
-//call getpost function given the id of the post
-gag.getPost(postId, function (err, res) {
+  /*
+  //call getpost function given the id of the post
+  gag.getPost(postId, function (err, res) {
 
-	if (res.type==='image'){
-		bot.sendPhoto(msg.chat.id, res.image);
+  	if (res.type==='image'){
+  		bot.sendPhoto(msg.chat.id, res.image);
 
-		bot.sendMessage(msg.chat.id, "Do you want me to save this?",{
-			"reply_markup": {
-				"keyboard": [["Yes", "No"]]
-    		}
-  		});
-
-  		bot.on('message', (msg) => {
-		var yesRes = "Yes";
-		if (msg.text.indexOf(yesRes) === 0) {
-    		download(res.image, res.title+'.jpg', function(){
-  			//console.log('done');
-			});;
-		}
-	});
-
-  	} else if (res.type==='video'){
-  		bot.sendVideo(msg.chat.id, res.video);
+      //console.log(msg);
 
   		bot.sendMessage(msg.chat.id, "Do you want me to save this?",{
-			"reply_markup": {
-				"keyboard": [["Yes", "No"]]
-    		}
-  		});
+          reply_markup: {
+            inline_keyboard: [
+              [{
+                  text: "Yes",
+                  callback_data: "yes",
+               },
+               {
+                  text: "No",
+                  callback_data: "no",
+               }]
+            ]
+          }
+      });
 
-  		bot.on('message', (msg) => {
-		var yesRes = "Yes";
-		if (msg.text.indexOf(yesRes) === 0) {
-    		download(res.video, res.title+'.mp4', function(){
-  				//console.log('done');
-			});;
-		}
-	});
-  	}
-  
-});
+    	bot.on('callback_query', (callbackQuery) => {
+        var msg_response = callbackQuery.data;
+        //console.log(callbackQuery.data);
+        if (msg_response === 'yes'){
+          download(res.image, res.title+'.jpg', function(){
+              //console.log('done');
+          });
+          bot.answerCallbackQuery(callbackQuery.id).then(() => bot.sendMessage(msg.chat.id, "Image saved!"));
+          bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+        } else {
+          bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+        };
+      });
 
-//call gettopcomments function given the id of the post
-gag.getTopComments(postId, function (err, res){
-  //console.log(res);
+    	} else if (res.type==='video'){
+    		bot.sendVideo(msg.chat.id, res.video);
 
-});
+    		bot.sendMessage(msg.chat.id, "Do you want me to save this?",{
+    			reply_markup: {
+    				inline_keyboard: [
+              [{
+                  text: "Yes",
+                  callback_data: "yes",
+               },
+               {
+                  text: "No",
+                  callback_data: "no",
+               }]
+            ]
+        	}
+    		});
+
+        bot.on('callback_query', (callbackQuery) => {
+          var msg_response = callbackQuery.data;
+          //console.log(callbackQuery.data);
+          if (msg_response === 'yes'){
+            download(res.video, res.title+'.mp4', function(){
+                //console.log('done');
+            });
+            bot.answerCallbackQuery(callbackQuery.id).then(() => bot.sendMessage(msg.chat.id, "Video saved!"));
+            bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+          } else {
+            bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+          };
+        });
+    	}
+    
+  });
+
+
+  */
+
+
+  //call gettopcomments function given the id of the post
+  gag.getTopComments(postId, function (err, res){    
+    
+    bot.sendMessage(msg.chat.id, "Do you want to see the top comments?",{
+          reply_markup: {
+            inline_keyboard: [
+              [{
+                  text: "Yes",
+                  callback_data: "yes",
+               },
+               {
+                  text: "No",
+                  callback_data: "no",
+               }]
+            ]
+          }
+    });
+
+    //sendComments(bot, msg.chat.id, res, 0);
+
+    bot.on('callback_query', (callbackQuery) => {
+      var msg_response = callbackQuery.data;
+      //console.log(callbackQuery.data);
+      if (msg_response === 'yes'){
+        bot.answerCallbackQuery(callbackQuery.id).then(() => sendComments(bot, msg.chat.id, res, 0));
+        bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+      } else {
+        bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id);
+        };
+    });
+
+    
+
+  });
 
 });
 
